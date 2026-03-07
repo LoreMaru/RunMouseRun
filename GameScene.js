@@ -1,6 +1,6 @@
 import { drawTiledBackgroundContrast, drawTiledBackgroundLighter } from './asset/tiledBackground.js';
 
-import { spawnCheese, spawnSnake, spawnCat, spawnElephant, handleCollisionStart  } from './gameMechanics.js';
+import { spawnCheese, spawnSnake, spawnCat, spawnElephant, spawnBroom, handleCollisionStart  } from './gameMechanics.js';
 
 
 class GameScene extends Phaser.Scene {
@@ -15,6 +15,7 @@ class GameScene extends Phaser.Scene {
     this.load.image('snake', './asset/serpente.png');
     this.load.image('cat', './asset/gatto.png');
     this.load.image('elephant', './asset/elefante.png');
+    this.load.image('broom', './asset/scopa.png');
     this.load.image('dog', './asset/cane2.png');
 
     this.load.image('ingranaggio', './asset/ingranaggio.png');
@@ -66,6 +67,7 @@ class GameScene extends Phaser.Scene {
     this.currentSnakeRate = 1000;
     this.currentCatRate = 2000;
     this.currentElephantRate = 2000;
+    this.currentBroomRate = 10000;
   
     this.snakeTimer = this.time.addEvent({
       delay: this.currentSnakeRate,
@@ -84,6 +86,12 @@ class GameScene extends Phaser.Scene {
       loop: true,
       callback: () => spawnElephant(this, this.collectedCheese, this.mouse)
     });  
+
+    this.broomTimer = this.time.addEvent({
+    delay: this.currentBroomRate,
+    loop: true,
+    callback: () => spawnBroom(this, this.collectedCheese, this.mouse)
+  });
 
     const startButton = this.add.rectangle(50, 20, 30, 30)
     .setInteractive({ useHandCursor: true })
@@ -158,6 +166,18 @@ class GameScene extends Phaser.Scene {
         delay: this.currentElephantRate,
         loop: true,
         callback: () => spawnElephant(this, this.collectedCheese, this.mouse)
+      });
+    }
+
+    //Aggiorna scopa spawn rate
+    const newBroomRate = this.collectedCheese < 60 ? 10000 : 6000;
+    if (newBroomRate !== this.currentBroomRate) {
+      this.currentBroomRate = newBroomRate;
+      this.broomTimer.remove();
+      this.broomTimer = this.time.addEvent({
+        delay: this.currentBroomRate,
+        loop: true,
+        callback: () => spawnBroom(this, this.collectedCheese, this.mouse)
       });
     }
 

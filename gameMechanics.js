@@ -13,7 +13,7 @@ export function onMouseCheeseCollision(mouse, cheese) {
 
 export function onMouseEnemyCollision(scene) {
   console.log("GAMEOVER")
-  //this.scene.pause();
+  this.scene.pause();
 }
 
 
@@ -244,6 +244,43 @@ export function spawnElephant(scene, collectedCheese, mouse){
   }
 }
 
+export function spawnBroom(scene, collectedCheese, mouse){
+  if(collectedCheese>=40){
+
+    const coordinataX = Phaser.Math.Between(150, 650);
+    const coordinataY = Phaser.Math.Between(150, 450);
+
+    const broom = scene.matter.add.image(coordinataX, coordinataY, 'broom');
+    broom.setDepth(2);
+    broom.setBody({
+      type: 'rectangle',
+      width: 35,
+      height: 110
+    }, {
+      isSensor: true,
+      label: 'broom'
+    });
+    broom.setIgnoreGravity(true);
+    broom.setStatic(true);
+    broom.setSensor(false);
+
+    scene.time.delayedCall(1200, () => {
+      if (broom.active) {
+        broom.setSensor(true);
+        broom.setStatic(false);
+        broom.setAngularVelocity(0.15);
+      }
+    });
+
+    scene.time.delayedCall(3200, () => {
+      if (broom.active) {
+        scene.matter.world.remove(broom.body);
+        broom.destroy();
+      }
+    });
+  }
+}
+
 /*NOTE:
 Commentati i singoli gestori delle collisioni per crearne uno unico
 */
@@ -260,7 +297,7 @@ export function handleCollisionStart(event) {
 
     if (
       labels.includes('mouse') &&
-      (labels.includes('snake') || labels.includes('cat') || labels.includes('elephant'))
+      (labels.includes('snake') || labels.includes('cat') || labels.includes('elephant') || labels.includes('broom'))
     ) {
       onMouseEnemyCollision.call(this);
     }
