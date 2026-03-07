@@ -1,6 +1,6 @@
 import { drawTiledBackgroundContrast, drawTiledBackgroundLighter } from './asset/tiledBackground.js';
 
-import { spawnCheese, spawnSnake, spawnCat, spawnElephant } from './gameMechanics.js';
+import { spawnCheese, spawnSnake, spawnCat, spawnElephant, handleCollisionStart  } from './gameMechanics.js';
 
 
 class GameScene extends Phaser.Scene {
@@ -46,6 +46,9 @@ class GameScene extends Phaser.Scene {
     this.mouse.setDepth(1);
     //this.mouse.setBounce(0.5);
     //this.mouse.setIgnoreGravity(true);
+
+    //COLLISIONI
+    this.matter.world.on('collisionstart', handleCollisionStart, this);
 
     //INGRANAGGIO
     this.ingranaggio = this.add.image(50, 20, 'ingranaggio');
@@ -149,13 +152,13 @@ class GameScene extends Phaser.Scene {
     // Aggiorna elephant spawn rate
     const randomElephant = Phaser.Math.Between(5000, 7000);
     const newElephantRate = this.collectedCheese < 31 ? 5000 : randomElephant;
-    if (newCatRate !== this.currentCatRate) {
-      this.currentCatRate = newCatRate;
-      this.catTimer.remove();
-      this.catTimer = this.time.addEvent({
-        delay: this.currentCatRate,
+    if (newElephantRate !== this.currentElephantRate) {
+      this.currentElephantRate = newElephantRate;
+      this.elephantTimer.remove();
+      this.elephantTimer = this.time.addEvent({
+        delay: this.currentElephantRate,
         loop: true,
-        callback: () => spawnCat(this, this.collectedCheese, this.mouse)
+        callback: () => spawnElephant(this, this.collectedCheese, this.mouse)
       });
     }
 

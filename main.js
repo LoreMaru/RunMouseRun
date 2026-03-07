@@ -12,7 +12,7 @@ const config = {
       debug: false
     }
   },
-  scene: [ GameScene, StartScene]
+  scene: [ GameScene, StartScene] //attualmente la start è disabilitata ma è raggiungibile dalla rotellina in alto a sx nella schermata di gioco
 };
 
 const game = new Phaser.Game(config);

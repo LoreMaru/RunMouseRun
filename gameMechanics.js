@@ -34,7 +34,7 @@ export function spawnCheese(scene, mouse) {
     scene.cheeses.push(cheese);
   }
 
-  mouse.body.label = 'mouse';
+  /*mouse.body.label = 'mouse';
   scene.matter.world.on('collisionstart', ev => {
     ev.pairs.forEach(({ bodyA, bodyB }) => {
       const labels = [bodyA.label, bodyB.label];
@@ -46,7 +46,7 @@ export function spawnCheese(scene, mouse) {
         }
       }
     });
-  });
+  });*/
 }
 
 
@@ -124,7 +124,7 @@ export function spawnSnake(scene, mouse, collectedCheese) {
   });
 
  // Listener collisioni
-  mouse.body.label = 'mouse';
+  /*mouse.body.label = 'mouse';
     scene.matter.world.on('collisionstart', ev => {
       ev.pairs.forEach(({ bodyA, bodyB }) => {
         const labels = [bodyA.label, bodyB.label];
@@ -132,7 +132,7 @@ export function spawnSnake(scene, mouse, collectedCheese) {
           onMouseEnemyCollision.call(scene);
         }
       });
-    });
+    });*/
 
 }
 
@@ -171,7 +171,7 @@ export function spawnCat(scene, collectedCheese, mouse){
     });
 
     // Listener collisioni
-    mouse.body.label = 'mouse';
+    /*mouse.body.label = 'mouse';
     scene.matter.world.on('collisionstart', ev => {
       ev.pairs.forEach(({ bodyA, bodyB }) => {
         const labels = [bodyA.label, bodyB.label];
@@ -179,7 +179,7 @@ export function spawnCat(scene, collectedCheese, mouse){
           onMouseEnemyCollision.call(scene);
         }
       });
-    });
+    });*/
   }
 }
 
@@ -232,7 +232,7 @@ export function spawnElephant(scene, collectedCheese, mouse){
     });
 
     // Listener collisioni
-    mouse.body.label = 'mouse';
+    /*mouse.body.label = 'mouse';
     scene.matter.world.on('collisionstart', ev => {
       ev.pairs.forEach(({ bodyA, bodyB }) => {
         const labels = [bodyA.label, bodyB.label];
@@ -240,6 +240,29 @@ export function spawnElephant(scene, collectedCheese, mouse){
           onMouseEnemyCollision.call(scene);
         }
       });
-    });
+    });*/
   }
+}
+
+/*NOTE:
+Commentati i singoli gestori delle collisioni per crearne uno unico
+*/
+export function handleCollisionStart(event) {
+  event.pairs.forEach(({ bodyA, bodyB }) => {
+    const labels = [bodyA.label, bodyB.label];
+
+    if (labels.includes('mouse') && labels.includes('cheese')) {
+      const cheeseSprite = (bodyA.label === 'cheese' ? bodyA : bodyB).gameObject;
+      if (cheeseSprite && cheeseSprite.active) {
+        onMouseCheeseCollision.call(this, this.mouse, cheeseSprite);
+      }
+    }
+
+    if (
+      labels.includes('mouse') &&
+      (labels.includes('snake') || labels.includes('cat') || labels.includes('elephant'))
+    ) {
+      onMouseEnemyCollision.call(this);
+    }
+  });
 }
