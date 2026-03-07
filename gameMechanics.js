@@ -333,7 +333,7 @@ export function spawnBroom(scene, collectedCheese, mouse){
           loop: true,
           callback: () => {
             if (broom.active) {
-              broom.setAngle(broom.angle + 15);
+              broom.setAngle(broom.angle + 15); //regola la velocità di spin della scopa
             }
           }
         });
