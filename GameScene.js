@@ -150,8 +150,7 @@ class GameScene extends Phaser.Scene {
     }
 
     // Aggiorna elephant spawn rate
-    const randomElephant = Phaser.Math.Between(5000, 7000);
-    const newElephantRate = this.collectedCheese < 31 ? 5000 : randomElephant;
+    const newElephantRate = this.collectedCheese < 31 ? 5000 : 7000;
     if (newElephantRate !== this.currentElephantRate) {
       this.currentElephantRate = newElephantRate;
       this.elephantTimer.remove();

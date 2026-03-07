@@ -13,7 +13,7 @@ export function onMouseCheeseCollision(mouse, cheese) {
 
 export function onMouseEnemyCollision(scene) {
   console.log("GAMEOVER")
-  this.scene.pause();
+  //this.scene.pause();
 }
 
 
