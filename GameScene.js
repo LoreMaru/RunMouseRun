@@ -2,6 +2,7 @@ import { drawTiledBackgroundContrast, drawTiledBackgroundLighter } from './asset
 
 import { spawnCheese, spawnSnake, spawnCat, spawnElephant } from './gameMechanics.js';
 
+
 class GameScene extends Phaser.Scene {
   constructor() {
     //super('GameScene');
@@ -32,10 +33,11 @@ class GameScene extends Phaser.Scene {
 
     this.scoreText = this.add.text(550, 10, `Punteggio: 0`, {
       fontSize: '25px',
+      fontFamily: 'Atma',
       fill: '#ffffff',
       stroke: '#000000',
       strokeThickness: 2
-    }).setDepth(10);
+    }).setDepth(5);
 
     //TOPO
     this.mouse = this.matter.add.image(400, 500, 'mouse');
@@ -79,6 +81,14 @@ class GameScene extends Phaser.Scene {
       loop: true,
       callback: () => spawnElephant(this, this.collectedCheese, this.mouse)
     });  
+
+    const startButton = this.add.rectangle(50, 20, 30, 30)
+    .setInteractive({ useHandCursor: true })
+    .setOrigin(0.5);
+
+    startButton.on('pointerdown', () => {
+        this.scene.start('StartScene', {  });
+    });
     
 
     // Define WASD keys
