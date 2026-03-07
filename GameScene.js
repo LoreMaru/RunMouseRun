@@ -1,6 +1,6 @@
 import { drawTiledBackgroundContrast, drawTiledBackgroundLighter } from './asset/tiledBackground.js';
 
-import { spawnCheese, spawnSnake, spawnCat, spawnElephant, spawnBroom, handleCollisionStart  } from './gameMechanics.js';
+import { spawnCheese, spawnSnake, spawnCat, spawnElephant, spawnBroom, handleCollisionStart, handleCollisionActive  } from './gameMechanics.js';
 
 
 class GameScene extends Phaser.Scene {
@@ -47,9 +47,12 @@ class GameScene extends Phaser.Scene {
     this.mouse.setDepth(1);
     //this.mouse.setBounce(0.5);
     //this.mouse.setIgnoreGravity(true);
+    //respinta della scopa
+    this.knockbackUntil = 0;
 
     //COLLISIONI
     this.matter.world.on('collisionstart', handleCollisionStart, this);
+    this.matter.world.on('collisionactive', handleCollisionActive, this);
 
     //INGRANAGGIO
     this.ingranaggio = this.add.image(50, 20, 'ingranaggio');
@@ -122,10 +125,19 @@ class GameScene extends Phaser.Scene {
     if (this.cursors.up.isDown || this.WASD.W.isDown) vy = -speed;
     else if (this.cursors.down.isDown || this.WASD.S.isDown) vy = speed;
 
+    /*Commentato e sostituito per respinta scopa
     this.mouse.setVelocity(vx, vy);
     // Optional: orientamento
     if (vx !== 0 || vy !== 0) {
       this.mouse.rotation = Math.atan2(vy, vx);
+    }*/
+
+     if (this.time.now >= this.knockbackUntil) {
+      this.mouse.setVelocity(vx, vy);
+
+      if (vx !== 0 || vy !== 0) {
+        this.mouse.rotation = Math.atan2(vy, vx);
+      }
     }
 
 

@@ -16,6 +16,25 @@ export function onMouseEnemyCollision(scene) {
   this.scene.pause();
 }
 
+//evento di collisione specifico per la scopa
+export function onMouseBroomCollision(broom) {
+  if (!broom || !broom.active) return;
+
+  const now = this.time.now;
+
+  if (now < this.knockbackUntil) return;
+  if (broom.lastHitAt && now - broom.lastHitAt < 250) return;
+
+  const dx = this.mouse.x - broom.x;
+  const dy = this.mouse.y - broom.y;
+  const len = Math.hypot(dx, dy) || 1;
+  const pushStrength = 6;
+
+  this.mouse.setVelocity((dx / len) * pushStrength, (dy / len) * pushStrength);
+  this.knockbackUntil = now + 180;
+  broom.lastHitAt = now;
+}
+
 
 export function spawnCheese(scene, mouse) {
   scene.remainingCheese = 5;
@@ -123,7 +142,7 @@ export function spawnSnake(scene, mouse, collectedCheese) {
     //scene.snakes = scene.snakes.filter(s => s !== snake);
   });
 
- // Listener collisioni
+ // Listener collisioni (commentato per metterne uno unico)
   /*mouse.body.label = 'mouse';
     scene.matter.world.on('collisionstart', ev => {
       ev.pairs.forEach(({ bodyA, bodyB }) => {
@@ -170,7 +189,7 @@ export function spawnCat(scene, collectedCheese, mouse){
       }
     });
 
-    // Listener collisioni
+    // Listener collisioni (commentato per metterne uno unico)
     /*mouse.body.label = 'mouse';
     scene.matter.world.on('collisionstart', ev => {
       ev.pairs.forEach(({ bodyA, bodyB }) => {
@@ -231,7 +250,7 @@ export function spawnElephant(scene, collectedCheese, mouse){
         });
     });
 
-    // Listener collisioni
+    // Listener collisioni (commentato per metterne uno unico)
     /*mouse.body.label = 'mouse';
     scene.matter.world.on('collisionstart', ev => {
       ev.pairs.forEach(({ bodyA, bodyB }) => {
@@ -243,7 +262,7 @@ export function spawnElephant(scene, collectedCheese, mouse){
     });*/
   }
 }
-
+/* Versione in cui la scopa fa danno
 export function spawnBroom(scene, collectedCheese, mouse){
   if(collectedCheese>=40){
 
@@ -279,11 +298,63 @@ export function spawnBroom(scene, collectedCheese, mouse){
       }
     });
   }
+}*/
+
+//Versione in cui la scopa respinge
+export function spawnBroom(scene, collectedCheese, mouse){
+  if(collectedCheese>=40){
+
+    const coordinataX = Phaser.Math.Between(150, 650);
+    const coordinataY = Phaser.Math.Between(150, 450);
+
+    const broom = scene.matter.add.image(coordinataX, coordinataY, 'broom');
+    broom.setDepth(2);
+    broom.setBody({
+      type: 'rectangle',
+      width: 35,
+      height: 110
+    }, {
+      isSensor: true,
+      label: 'broom'
+    });
+
+    broom.setIgnoreGravity(true);
+    broom.setStatic(true);
+    broom.setSensor(true);
+    broom.isTurning = false;
+    broom.lastHitAt = 0;
+
+    scene.time.delayedCall(1200, () => {
+      if (broom.active) {
+        broom.isTurning = true;
+
+        broom.spinTimer = scene.time.addEvent({
+          delay: 16,
+          loop: true,
+          callback: () => {
+            if (broom.active) {
+              broom.setAngle(broom.angle + 15);
+            }
+          }
+        });
+      }
+    });
+
+    scene.time.delayedCall(3200, () => {
+      if (broom.active) {
+        if (broom.spinTimer) {
+          broom.spinTimer.remove();
+        }
+        scene.matter.world.remove(broom.body);
+        broom.destroy();
+      }
+    });
+  }
 }
 
 /*NOTE:
 Commentati i singoli gestori delle collisioni per crearne uno unico
-*/
+versione con scopa che fa danni
 export function handleCollisionStart(event) {
   event.pairs.forEach(({ bodyA, bodyB }) => {
     const labels = [bodyA.label, bodyB.label];
@@ -300,6 +371,42 @@ export function handleCollisionStart(event) {
       (labels.includes('snake') || labels.includes('cat') || labels.includes('elephant') || labels.includes('broom'))
     ) {
       onMouseEnemyCollision.call(this);
+    }
+  });
+}*/
+
+//Gestore collisioni con danni
+export function handleCollisionStart(event) {
+  event.pairs.forEach(({ bodyA, bodyB }) => {
+    const labels = [bodyA.label, bodyB.label];
+
+    if (labels.includes('mouse') && labels.includes('cheese')) {
+      const cheeseSprite = (bodyA.label === 'cheese' ? bodyA : bodyB).gameObject;
+      if (cheeseSprite && cheeseSprite.active) {
+        onMouseCheeseCollision.call(this, this.mouse, cheeseSprite);
+      }
+    }
+
+    if (
+      labels.includes('mouse') &&
+      (labels.includes('snake') || labels.includes('cat') || labels.includes('elephant'))
+    ) {
+      onMouseEnemyCollision.call(this);
+    }
+  });
+}
+
+//Gestore collisioni con respinta
+export function handleCollisionActive(event) {
+  event.pairs.forEach(({ bodyA, bodyB }) => {
+    const labels = [bodyA.label, bodyB.label];
+
+    if (labels.includes('mouse') && labels.includes('broom')) {
+      const broomSprite = bodyA.label === 'broom' ? bodyA.gameObject : bodyB.gameObject;
+
+      if (broomSprite && broomSprite.active && broomSprite.isTurning) {
+        onMouseBroomCollision.call(this, broomSprite);
+      }
     }
   });
 }
