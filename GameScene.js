@@ -101,7 +101,8 @@ class GameScene extends Phaser.Scene {
     .setOrigin(0.5);
 
     startButton.on('pointerdown', () => {
-        this.scene.start('StartScene', {  });
+      //FA PARTIRE LA SCHERMATA DI AVVIO QUANDO SI CLICCA L'INGRANAGGIO
+      //this.scene.start('StartScene', {  });
     });
     
 
